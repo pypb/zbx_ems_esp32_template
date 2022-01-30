@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2022-01-30T11:52:29Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template EMS-ESP32 Gateway</template>
+            <name>Template EMS-ESP32 Gateway</name>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>EMS-ESP32</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Boiler Last Errorcode</name>
+                    <type>HTTP_AGENT</type>
+                    <key>emsgw_boiler_lastcode</key>
+                    <delay>3m</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>EMS-ESP32</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.body.value</params>
+                        </step>
+                    </preprocessing>
+                    <url>http://{HOST.IP}/api/boiler/lastcode</url>
+                    <output_format>JSON</output_format>
+                    <triggers>
+                        <trigger>
+                            <expression>{diff()}=1</expression>
+                            <name>Boiler Error Code has changed</name>
+                            <opdata>Error Code: {ITEM.LASTVALUE1}</opdata>
+                            <priority>HIGH</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>EMS Bus Rx Line Quality</name>
+                    <type>HTTP_AGENT</type>
+                    <key>emsgw_bus_rx_quality</key>
+                    <delay>3m</delay>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>EMS-ESP32</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.body.Status['rx line quality']</params>
+                        </step>
+                    </preprocessing>
+                    <url>http://{HOST.IP}/api/system/info</url>
+                    <output_format>JSON</output_format>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;{$EMS_MIN_RXQUAL}</expression>
+                            <name>EMS Bus Rx Quality is less than {$EMS_MIN_RXQUAL}%</name>
+                            <opdata>Current quality: {ITEM.LASTVALUE1}</opdata>
+                            <priority>WARNING</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>EMS Bus Status</name>
+                    <type>HTTP_AGENT</type>
+                    <key>emsgw_bus_status</key>
+                    <delay>3m</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>EMS-ESP32</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.body.Status['bus status']</params>
+                        </step>
+                    </preprocessing>
+                    <url>http://{HOST.IP}/api/system/info</url>
+                    <output_format>JSON</output_format>
+                    <triggers>
+                        <trigger>
+                            <expression>{regexp(^connected$)}=0</expression>
+                            <name>EMS Bus is not connected</name>
+                            <opdata>Current status: {ITEM.LASTVALUE1}</opdata>
+                            <priority>WARNING</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>EMS Bus Tx Line Quality</name>
+                    <type>HTTP_AGENT</type>
+                    <key>emsgw_bus_tx_quality</key>
+                    <delay>3m</delay>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>EMS-ESP32</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.body.Status['tx line quality']</params>
+                        </step>
+                    </preprocessing>
+                    <url>http://{HOST.IP}/api/system/info</url>
+                    <output_format>JSON</output_format>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;{$EMS_MIN_TXQUAL}</expression>
+                            <name>EMS Bus Tx Quality is less than {$EMS_MIN_TXQUAL}%</name>
+                            <opdata>Current quality: {ITEM.LASTVALUE1}</opdata>
+                            <priority>WARNING</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Gateway Available RAM</name>
+                    <type>HTTP_AGENT</type>
+                    <key>emsgw_freemem</key>
+                    <delay>3m</delay>
+                    <units>kB</units>
+                    <applications>
+                        <application>
+                            <name>EMS-ESP32</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.body.System.freemem</params>
+                        </step>
+                    </preprocessing>
+                    <url>http://{HOST.IP}/api/system/info</url>
+                    <output_format>JSON</output_format>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;{$EMS_LOW_RAM}</expression>
+                            <name>Gateway Available Memory is less than {$EMS_LOW_RAM}kB</name>
+                            <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                            <priority>WARNING</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>MQTT Status</name>
+                    <type>HTTP_AGENT</type>
+                    <key>emsgw_mqtt_status</key>
+                    <delay>3m</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>EMS-ESP32</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.body.Status.MQTT</params>
+                        </step>
+                    </preprocessing>
+                    <url>http://{HOST.IP}/api/system/info</url>
+                    <output_format>JSON</output_format>
+                    <triggers>
+                        <trigger>
+                            <expression>{regexp(^connected$)}=0</expression>
+                            <name>MQTT is not connected</name>
+                            <opdata>Current status: {ITEM.LASTVALUE1}</opdata>
+                            <priority>WARNING</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Gateway Uptime</name>
+                    <type>HTTP_AGENT</type>
+                    <key>emsgw_uptime</key>
+                    <delay>3m</delay>
+                    <units>s</units>
+                    <applications>
+                        <application>
+                            <name>EMS-ESP32</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.body.System['uptime (seconds)']</params>
+                        </step>
+                    </preprocessing>
+                    <url>http://{HOST.IP}/api/system/info</url>
+                    <output_format>JSON</output_format>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;900</expression>
+                            <name>Gateway has been restarted</name>
+                            <opdata>Current Uptime: {ITEM.LASTVALUE1}</opdata>
+                            <priority>WARNING</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+            <macros>
+                <macro>
+                    <macro>{$EMS_LOW_RAM}</macro>
+                    <value>100</value>
+                    <description>Low RAM threshold</description>
+                </macro>
+                <macro>
+                    <macro>{$EMS_MIN_RXQUAL}</macro>
+                    <value>100</value>
+                    <description>Low Rx Quality threshold</description>
+                </macro>
+                <macro>
+                    <macro>{$EMS_MIN_TXQUAL}</macro>
+                    <value>100</value>
+                    <description>Low Tx Quality threshold</description>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+</zabbix_export>
