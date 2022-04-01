@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2022-01-30T11:52:29Z</date>
+    <date>2022-04-01T05:16:24Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -26,7 +26,7 @@
                     <name>Boiler Last Errorcode</name>
                     <type>HTTP_AGENT</type>
                     <key>emsgw_boiler_lastcode</key>
-                    <delay>3m</delay>
+                    <delay>5m</delay>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                     <applications>
@@ -44,10 +44,13 @@
                     <output_format>JSON</output_format>
                     <triggers>
                         <trigger>
-                            <expression>{diff()}=1</expression>
-                            <name>Boiler Error Code has changed</name>
+                            <expression>{diff()}=1 and {regexp(^not set$)}=0</expression>
+                            <recovery_mode>NONE</recovery_mode>
+                            <name>New Boiler Error Code</name>
                             <opdata>Error Code: {ITEM.LASTVALUE1}</opdata>
                             <priority>HIGH</priority>
+                            <type>MULTIPLE</type>
+                            <manual_close>YES</manual_close>
                         </trigger>
                     </triggers>
                 </item>
@@ -55,7 +58,7 @@
                     <name>EMS Bus Rx Line Quality</name>
                     <type>HTTP_AGENT</type>
                     <key>emsgw_bus_rx_quality</key>
-                    <delay>3m</delay>
+                    <delay>60m</delay>
                     <units>%</units>
                     <applications>
                         <application>
@@ -83,7 +86,7 @@
                     <name>EMS Bus Status</name>
                     <type>HTTP_AGENT</type>
                     <key>emsgw_bus_status</key>
-                    <delay>3m</delay>
+                    <delay>15m</delay>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                     <applications>
@@ -112,7 +115,7 @@
                     <name>EMS Bus Tx Line Quality</name>
                     <type>HTTP_AGENT</type>
                     <key>emsgw_bus_tx_quality</key>
-                    <delay>3m</delay>
+                    <delay>60m</delay>
                     <units>%</units>
                     <applications>
                         <application>
@@ -140,7 +143,7 @@
                     <name>Gateway Available RAM</name>
                     <type>HTTP_AGENT</type>
                     <key>emsgw_freemem</key>
-                    <delay>3m</delay>
+                    <delay>15m</delay>
                     <units>kB</units>
                     <applications>
                         <application>
@@ -158,7 +161,7 @@
                     <triggers>
                         <trigger>
                             <expression>{last()}&lt;{$EMS_LOW_RAM}</expression>
-                            <name>Gateway Available Memory is less than {$EMS_LOW_RAM}kB</name>
+                            <name>EMS Gateway Available Memory is less than {$EMS_LOW_RAM}kB</name>
                             <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                             <priority>WARNING</priority>
                         </trigger>
@@ -168,7 +171,7 @@
                     <name>MQTT Status</name>
                     <type>HTTP_AGENT</type>
                     <key>emsgw_mqtt_status</key>
-                    <delay>3m</delay>
+                    <delay>15m</delay>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                     <applications>
@@ -197,7 +200,7 @@
                     <name>Gateway Uptime</name>
                     <type>HTTP_AGENT</type>
                     <key>emsgw_uptime</key>
-                    <delay>3m</delay>
+                    <delay>15m</delay>
                     <units>s</units>
                     <applications>
                         <application>
@@ -214,8 +217,8 @@
                     <output_format>JSON</output_format>
                     <triggers>
                         <trigger>
-                            <expression>{last()}&lt;900</expression>
-                            <name>Gateway has been restarted</name>
+                            <expression>{last()}&lt;1800</expression>
+                            <name>EMS Gateway has been restarted</name>
                             <opdata>Current Uptime: {ITEM.LASTVALUE1}</opdata>
                             <priority>WARNING</priority>
                         </trigger>
